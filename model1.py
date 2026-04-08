@@ -10,6 +10,14 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from torchvision import models
 
+def build_svm_estimator():
+
+    """Create the SVM pipeline used across training and cross-validation."""
+    return make_pipeline(
+        StandardScaler(),
+        SVC(kernel="rbf", C=10, gamma="scale", class_weight="balanced"),
+    )
+
 def build_resnet50_feature_extractor(device: torch.device) -> torch.nn.Module:
 
     """Load pretrained ResNet50 and remove final classification layer."""
@@ -45,9 +53,7 @@ def extract_cnn_features(dataloader, feature_extractor: torch.nn.Module, device:
 def train_svm(features: np.ndarray, labels: np.ndarray):
     
     """Train a simple SVM on extracted CNN features."""
-    svm_model = make_pipeline(StandardScaler(),
-    SVC(kernel="rbf", C=10, gamma="scale", class_weight="balanced"),
-    )
+    svm_model = build_svm_estimator()
     svm_model.fit(features, labels)
 
     return svm_model
